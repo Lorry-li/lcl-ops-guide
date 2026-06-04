@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 使用指南 — LCL Ops Team</title>
+<style>
+:root {
+  --color-midnight:  #052439;
+  --color-tinted:    #07304c;
+  --color-white:     #ffffff;
+  --color-terrain:   #f4f2f0;
+  --color-teal:      #015f74;
+  --color-sky:       #5eb6f1;
+  --color-indigo:    #566ae5;
+  --color-seafoam:   #00d4a0;
+  --color-frost:     #e2f2fc;
+  --color-black:     #000000;
+  --color-danger:    #c0392b;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+  background: var(--color-terrain);
+  color: var(--color-midnight);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ── NAV ── */
+nav {
+  background: var(--color-midnight);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-white);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.2px;
+}
+.nav-pill {
+  background: var(--color-teal);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+.nav-links {
+  display: flex;
+  gap: 6px;
+}
+.nav-links a {
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.nav-links a:hover { color: white; background: rgba(255,255,255,0.1); }
+
+/* ── HERO ── */
+.hero {
+  background: var(--color-midnight);
+  padding: 56px 32px 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(94,182,241,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -40px; left: -40px;
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(0,212,160,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-seafoam);
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--color-white);
+  line-height: 1.15;
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+.hero h1 span { color: var(--color-sky); }
+.hero-sub {
+  font-size: 15px;
+  color: rgba(255,255,255,0.6);
+  max-width: 520px;
+  margin: 0 auto 28px;
+}
+.hero-badges {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.badge-ops { background: rgba(94,182,241,0.15); color: var(--color-sky); border: 1px solid rgba(94,182,241,0.3); }
+.badge-cs  { background: rgba(0,212,160,0.12); color: var(--color-seafoam); border: 1px solid rgba(0,212,160,0.25); }
+.badge-tip { background: rgba(86,106,229,0.15); color: #a5b4fc; border: 1px solid rgba(86,106,229,0.3); }
+
+/* ── LAYOUT ── */
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* ── SECTION TITLES ── */
+.section-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-teal);
+  margin: 48px 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-teal);
+  opacity: 0.2;
+}
+
+/* ── GOLDEN RULE CARD ── */
+.golden-rule {
+  background: var(--color-midnight);
+  border-radius: 14px;
+  padding: 24px 28px;
+  margin-bottom: 12px;
+  border-left: 4px solid var(--color-seafoam);
+  position: relative;
+  overflow: hidden;
+}
+.golden-rule::before {
+  content: '💡';
+  position: absolute;
+  right: 24px;
+  top: 20px;
+  font-size: 28px;
+  opacity: 0.2;
+}
+.golden-rule h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-seafoam);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.golden-rule p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.65;
+}
+.golden-rule strong { color: white; }
+
+/* ── FORMULA BLOCK ── */
+.formula {
+  background: var(--color-tinted);
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin: 16px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--color-sky);
+  border: 1px solid rgba(94,182,241,0.2);
+  line-height: 1.7;
+}
+.formula span { color: var(--color-seafoam); }
+.formula em { color: rgba(255,255,255,0.45); font-style: normal; }
+
+/* ── USE CASE TABS ── */
+.tab-bar {
+  display: flex;
+  gap: 6px;
+  background: var(--color-white);
+  border-radius: 10px;
+  padding: 6px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(5,36,57,0.5);
+  transition: all 0.18s;
+  font-family: inherit;
+}
+.tab-btn.active {
+  background: var(--color-midnight);
+  color: white;
+}
+.tab-btn:hover:not(.active) {
+  background: var(--color-terrain);
+  color: var(--color-midnight);
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── PROMPT CARD ── */
+.prompt-card {
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 20px 22px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(5,36,57,0.07);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  transition: box-shadow 0.15s;
+}
+.prompt-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.09); }
+
+.prompt-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.prompt-icon {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: var(--color-frost);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.prompt-meta { flex: 1; }
+.prompt-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-midnight);
+  line-height: 1.3;
+}
+.prompt-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.tag-ops { background: #e0f0fb; color: #015f74; }
+.tag-cs  { background: #d6faf2; color: #00694f; }
+.tag-sop { background: #ede9ff; color: #4338ca; }
+
+.prompt-box {
+  background: var(--color-terrain);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--color-tinted);
+  line-height: 1.65;
+  border-left: 3px solid var(--color-teal);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.prompt-box:hover { background: #ebe8e5; }
+.copy-hint {
+  position: absolute;
+  top: 8px; right: 10px;
+  font-size: 10px;
+  color: rgba(5,36,57,0.35);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.copy-hint.copied { color: var(--color-seafoam); }
+.prompt-note {
+  font-size: 12px;
+  color: rgba(5,36,57,0.5);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(5,36,57,0.06);
+}
+.prompt-note strong { color: var(--color-teal); }
+
+/* ── TOOL BUILDER SECTION ── */
+.builder-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media(max-width: 600px) { .builder-grid { grid-template-columns: 1fr; } }
+
+.builder-card {
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(5,36,57,0.07);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.builder-card h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-midnight);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.builder-card p {
+  font-size: 12.5px;
+  color: rgba(5,36,57,0.6);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.builder-prompt {
+  background: var(--color-terrain);
+  border-radius: 7px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--color-tinted);
+  line-height: 1.6;
+  border-left: 3px solid var(--color-indigo);
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.builder-prompt:hover { background: #ebe8e5; }
+
+/* ── DO / DON'T ── */
+.dos-donts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media(max-width: 600px) { .dos-donts { grid-template-columns: 1fr; } }
+
+.do-card, .dont-card {
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.do-card {
+  background: #e8faf4;
+  border: 1px solid rgba(0,212,160,0.25);
+}
+.dont-card {
+  background: #fdf0ef;
+  border: 1px solid rgba(192,57,43,0.2);
+}
+.do-card h4 { color: #00694f; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+.dont-card h4 { color: var(--color-danger); font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+.do-card li, .dont-card li {
+  font-size: 13px;
+  line-height: 1.65;
+  margin-bottom: 6px;
+  padding-left: 4px;
+  list-style: none;
+  display: flex;
+  gap: 7px;
+}
+.do-card li::before { content: '✓'; color: #00d4a0; font-weight: 700; flex-shrink: 0; }
+.dont-card li::before { content: '✗'; color: var(--color-danger); font-weight: 700; flex-shrink: 0; }
+
+/* ── LEVELS ── */
+.level-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.level-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.lv1 { background: #e8faf4; color: #00694f; }
+.lv2 { background: #e0f0fb; color: #015f74; }
+.lv3 { background: #ede9ff; color: #4338ca; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--color-midnight);
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+  padding: 24px 32px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+footer strong { color: rgba(255,255,255,0.8); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--color-midnight);
+  color: var(--color-seafoam);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(0,212,160,0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s;
+  z-index: 999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <span>⚓</span>
+    <span>Claude × LCL Ops</span>
+    <span class="nav-pill">PRS Network</span>
+  </div>
+  <div class="nav-links">
+    <a href="#basics">基础入门</a>
+    <a href="#prompts">Prompt模版</a>
+    <a href="#boc">BOC日常WI</a>
+    <a href="#tools">自研工具</a>
+    <a href="#rules">注意事项</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Team Guide · Internal Use Only</div>
+  <h1>用 <span>Claude</span> 提升<br>你的 LCL 日常效率</h1>
+  <p class="hero-sub">给 PRS Network Ops 团队的实战指南 — 从第一个prompt开始，到自己开发小工具</p>
+  <div class="hero-badges">
+    <span class="badge badge-ops">⚙️ Ops Specialist</span>
+    <span class="badge badge-cs">💬 Customer Service</span>
+    <span class="badge badge-tip">🚀 无需coding基础</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- SECTION 1: 基础入门 -->
+  <div id="basics" class="section-title">第一步 — 怎么跟 Claude 说话</div>
+
+  <div class="golden-rule">
+    <h3>🔑 黄金法则：Context 越清楚，结果越好</h3>
+    <p>Claude 不是搜索引擎，也不是下命令的机器。把它想象成一个<strong>刚入职的聪明同事</strong>——你需要给它背景、目的和你想要的格式，它才能真正帮到你。</p>
+  </div>
+
+  <div class="formula">
+    <em># 好的Prompt公式</em><br>
+    <span>【我是谁/我在做什么】</span> + <span>【我需要什么】</span> + <span>【输出格式/语言要求】</span><br><br>
+    <em># 举例</em><br>
+    我是LCL Ops，处理一封来自Yantian CFS的货代邮件。<br>
+    帮我提取：船名、ETD、截关时间、以及所有exception。<br>
+    输出成表格，中英对照。<br>
+    <em>---以下是邮件内容---</em>
+  </div>
+
+  <div class="golden-rule" style="border-left-color: var(--color-sky); margin-top:12px;">
+    <h3 style="color:var(--color-sky);">💬 3个马上能用的技巧</h3>
+    <p>
+      <strong>1. 贴原文进去</strong> — 把邮件、聊天记录、表格直接paste，Claude看得懂。<br>
+      <strong>2. 说"重新来过"</strong> — 结果不满意？直接说"太正式了，改短一点"或"换中文"。<br>
+      <strong>3. 追问比重问好</strong> — 在同一对话里继续追问，Claude记得上下文，不用重复解释。
+    </p>
+  </div>
+
+  <!-- SECTION 2: Prompt模版 -->
+  <div id="prompts" class="section-title">Prompt 模版 — 直接复制使用</div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('ops')">⚙️ Ops Specialist</button>
+    <button class="tab-btn" onclick="switchTab('cs')">💬 Customer Service</button>
+    <button class="tab-btn" onclick="switchTab('both')">🤝 通用</button>
+  </div>
+
+  <!-- OPS TAB -->
+  <div id="tab-ops" class="tab-panel active">
+
+    <div class="prompt-card">
+      <div class="prompt-header">
+        <div class="prompt-icon">📧</div>
+        <div class="prompt-meta">
+          <div class="prompt-title">提取货代/CFS邮件关键信息</div>
+          <span class="prompt-tag tag-ops">Ops</span>
+        </div>
+      </div>
+      <div class="prompt-box" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        我是LCL Ops，收到一封来自[CFS名称/货代名称]的邮件。请帮我提取以下信息，输出成表格：<br>
+        - 船名 / 航次<br>
+        - ETD（预计离港时间）<br>
+        - 截关时间（cargo cutoff）<br>
+        - 任何exception或特殊要求<br>
+        - 需要我回复或跟进的action items<br><br>
+        邮件内容如下：<br>
+        [粘贴邮件]
+      </div>
+      <div class="prompt-note"><strong>小技巧：</strong>加一句"如有中文内容请翻译成英文"可以让输出更统一。</div>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-header">
+        <div class="prompt-icon">📦</div>
+        <div class="prompt-meta">
+          <div class="prompt-title">计算CBM与集装箱利用率</div>
+          <span class="prompt-tag tag-ops">Ops</span>
+        </div>
+      </div>
+      <div class="prompt-box" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我计算这票货的集装箱利用率。<br><br>
+        货物明细如下：<br>
+        [粘贴装箱单或SKU列表，包含每箱CBM/重量/数量]<br><br>
+        请计算：<br>
+        1. 总CBM 和 总重量<br>
+        2. 分别对比 20GP（25 CBM / 21,700 kg）、40HQ（76 CBM / 26,500 kg）的利用率%<br>
+        3. 告诉我哪个箱型最合适，原因是什么
+      </div>
+      <div class="prompt-note"><strong>适用场景：</strong>报价前估箱、核对shipper装箱数据、判断是否可以拼箱。</div>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-header">
+        <div class="prompt-icon">⚠️</div>
+        <div class="prompt-meta">
+          <div class="prompt-title">起草内部延误通报（给团队/上级）</div>
+          <span class="prompt-tag tag-ops">Ops</span>
+        </div>
+      </div>
+      <div class="prompt-box" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我写一份内部延误通报，发给我的manager和相关同事。<br><br>
+        情况如下：<br>
+        - 客户/货物：[客户名称]<br>
+        - 原因：[例如：船期滚装 / CFS截关延误 / 证件问题]<br>
+        - 原ETD：[日期]<br>
+        - 新ETD：[日期]<br>
+        - 目前已采取的行动：[说明]<br>
+        - 下一步：[说明]<br><br>
+        语气要专业简洁，不要过度道歉，重点在事实和解决方案。用英文输出。
+      </div>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-header">
+        <div class="prompt-icon">📊</div>
+        <div class="prompt-meta">
+          <div class="prompt-title">整理OTP数据并找出问题航线</div>
+          <span class="prompt-tag tag-ops">Ops</span>
+        </div>
+      </div>
+      <div class="prompt-box" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        我有一份OTP数据表（已粘贴/上传），请帮我分析：<br><br>
+        1. 找出OTP低于90%的航线，按OTP从低到高排列<br>
+        2. 统计每条问题航线的延误次数和平均延误天数<br>
+        3. 如果能看出原因（比如某个月集中延误），请标注出来<br>
+        4. 输出成一个简洁的表格，最后加3句总结<br><br>
+        数据如下：<br>
+        [粘贴数据]
+      </div>
+      <div class="prompt-note"><strong>进阶：</strong>可以让Claude同时生成一段发给Joyce/Parker的简报文字。</div>
+    </div>
+
+    <!-- ── CS TAB -->
+  <div id="tab-cs" class="tab-panel">
+
+    <div class="prompt-card">
+      <div class="prompt-header">
+        <div class="prompt-icon">📩</div>
+        <div class="prompt-meta">
+          <div class="prompt-title">回复Shipper的货物状态查询</div>
+          <span class="prompt-tag tag-cs">Customer Service</span>
+        </div>
+      </div>
+      <div class="prompt-box" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我写一封回复邮件，回应客户的货物状态查询。<br><br>
+        当前情况：<br>
+        - 客户：[客户名称]<br>
+        - 货物状态：[例如：已在CNSHG CFS，等待截关装船]<br>
+        - 预计ETD：[日期]<br>
+        - 预计ETA目的港：[日期]<br>
+        - 是否有任何延误/风险：[有/无，如有请说明]<br><br>
+        要求：语气专业友好，简短清晰，英文输出。如果有延误，不要回避，直接说明原因和应对。
+      </div>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-header">
+        <div class="prompt-icon">🚨</div>
+        <div class="prompt-meta">
+          <div class="prompt-title">起草客户延误道歉信</div>
+          <span class="prompt-tag tag-cs">Customer Service</span>
+        </div>
+      </div>
+      <div class="prompt-box" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我写一封给客户的延误通知邮件。<br><br>
+        - 客户名称：[名称]<br>
+        - 延误原因：[例如：台风影响港口操作 / 船公司临时更换船期]<br>
+        - 原ETA：[日期]<br>
+        - 新ETA：[日期]<br>
+        - Flexport的应对措施：[说明]<br><br>
+        语气：专业、诚恳，但不要过度道歉或显得慌乱。重点放在我们的应对和新时间表。英文输出。
+      </div>
+      <div class="prompt-note"><strong>注意：</strong>发送前务必核对ETA和原因是否准确，Claude给的是草稿。</div>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-header">
+        <div class="prompt-icon">🌐</div>
+        <div class="prompt-meta">
+          <div class="prompt-title">中英双语翻译操作通知</div>
+          <span class="prompt-tag tag-cs">Customer Service</span>
+        </div>
+      </div>
+      <div class="prompt-box" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我把以下操作通知翻译成[中文/英文]，保持专业的物流行业用语，不要过于口语化。<br><br>
+        [粘贴原文]<br><br>
+        翻译完成后，请检查一下有没有容易引起歧义的地方，如有请标注出来。
+      </div>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-header">
+        <div class="prompt-icon">📋</div>
+        <div class="prompt-meta">
+          <div class="prompt-title">整理Shipper onboarding所需文件清单</div>
+          <span class="prompt-tag tag-cs">Customer Service</span>
+        </div>
+      </div>
+      <div class="prompt-box" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        我需要给一个新的LCL shipper发送onboarding所需文件清单。<br><br>
+        背景：<br>
+        - 货物类型：[例如：一般货物 / 危险品 / 需要澳洲生物安全申报]<br>
+        - 目的地：[例如：美国USLAX / 澳大利亚AUSYD]<br>
+        - 是否需要特殊证书：[是/否]<br><br>
+        请列出他们需要提供的完整文件清单，分为"必须"和"视情况"两类，用中英对照格式输出。
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTH TAB -->
+  <div id="tab-both" class="tab-panel">
+
+    <div class="prompt-card">
+      <div class="prompt-header">
+        <div class="prompt-icon">📝</div>
+        <div class="prompt-meta">
+          <div class="prompt-title">总结一段长对话/会议记录的要点</div>
+          <span class="prompt-tag tag-ops">通用</span>
+        </div>
+      </div>
+      <div class="prompt-box" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我总结以下[Slack讨论/会议记录/邮件链]的要点。<br><br>
+        请分为三个部分输出：<br>
+        1. 📌 关键决定（已确认的事项）<br>
+        2. ⏳ 待办事项（谁负责、截止时间）<br>
+        3. ❓ 未解决问题（还需要跟进的）<br><br>
+        内容如下：<br>
+        [粘贴内容]
+      </div>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-header">
+        <div class="prompt-icon">✍️</div>
+        <div class="prompt-meta">
+          <div class="prompt-title">把草稿改得更专业</div>
+          <span class="prompt-tag tag-ops">通用</span>
+        </div>
+      </div>
+      <div class="prompt-box" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我把这段草稿改得更专业，保持原意，语气正式但不生硬。目标读者是[客户/manager/carrier]。<br><br>
+        原文：<br>
+        [粘贴草稿]<br><br>
+        如果有表达不清楚的地方，请标注出来并建议修改。
+      </div>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-header">
+        <div class="prompt-icon">🔍</div>
+        <div class="prompt-meta">
+          <div class="prompt-title">解释一个不熟悉的物流术语或条款</div>
+          <span class="prompt-tag tag-ops">通用</span>
+        </div>
+      </div>
+      <div class="prompt-box" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        请用简单的中文解释"[术语]"在LCL/物流/海运场景下的意思，并给一个实际例子说明它对我们操作的影响。不需要学术定义，越实际越好。
+      </div>
+      <div class="prompt-note"><strong>例子：</strong>可以问 in-bond delivery、FIRMS code、ATT/QTT、co-loader、AUPD 等。</div>
+    </div>
+
+  </div>
+
+  <!-- SECTION BOC: 触类旁通场景 -->
+  <div id="boc" class="section-title">遇到这些情况 — 想到用 Claude</div>
+
+  <div class="golden-rule" style="border-left-color: var(--color-indigo);">
+    <h3 style="color:#a5b4fc;">💡 不是"按步骤用Claude"，而是"遇到什么感觉，开始想到Claude"</h3>
+    <p>FFA里的WI流程已经很完善了。Claude真正能帮你的，是那些<strong>FFA解决不了、但每天都在消耗你时间和精力</strong>的地方——理解一个复杂情况、处理一封棘手邮件、面对一个没有标准答案的问题。</p>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
+
+    <div style="background:var(--color-white); border-radius:14px; padding:22px; border:1px solid rgba(5,36,57,0.07); box-shadow:0 1px 6px rgba(0,0,0,0.04); border-top:3px solid var(--color-sky);">
+      <div style="font-size:22px; margin-bottom:10px;">😤</div>
+      <div style="font-size:13px; font-weight:800; color:var(--color-midnight); margin-bottom:6px;">当你收到一封"看不懂"的邮件</div>
+      <p style="font-size:12.5px; color:rgba(5,36,57,0.6); line-height:1.65; margin-bottom:14px;">混合中英文、格式乱、信息散落各处，你要提取要点但又怕漏掉什么。</p>
+      <div style="background:var(--color-terrain); border-radius:8px; padding:11px 13px; font-size:12px; color:var(--color-tinted); line-height:1.6; border-left:3px solid var(--color-sky); cursor:pointer; position:relative;" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        这封邮件来自[Co-loader/Carrier/Shipper]，帮我提取所有需要我处理的action items，按紧急程度排列，并标出截止时间（如有）。[粘贴邮件]
+      </div>
+    </div>
+
+    <div style="background:var(--color-white); border-radius:14px; padding:22px; border:1px solid rgba(5,36,57,0.07); box-shadow:0 1px 6px rgba(0,0,0,0.04); border-top:3px solid var(--color-seafoam);">
+      <div style="font-size:22px; margin-bottom:10px;">🤯</div>
+      <div style="font-size:13px; font-weight:800; color:var(--color-midnight); margin-bottom:6px;">当你遇到一个没见过的问题</div>
+      <p style="font-size:12.5px; color:rgba(5,36,57,0.6); line-height:1.65; margin-bottom:14px;">Shipper问了一个你不确定的问题，或出现了一个不熟悉的货物情况、规则、目的地要求。</p>
+      <div style="background:var(--color-terrain); border-radius:8px; padding:11px 13px; font-size:12px; color:var(--color-tinted); line-height:1.6; border-left:3px solid var(--color-seafoam); cursor:pointer; position:relative;" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        我是LCL Ops，Shipper问我"[问题原文]"。请用简单的中文解释这个问题的答案，并告诉我在我们的操作流程里需要注意什么。
+      </div>
+    </div>
+
+    <div style="background:var(--color-white); border-radius:14px; padding:22px; border:1px solid rgba(5,36,57,0.07); box-shadow:0 1px 6px rgba(0,0,0,0.04); border-top:3px solid var(--color-teal);">
+      <div style="font-size:22px; margin-bottom:10px;">✍️</div>
+      <div style="font-size:13px; font-weight:800; color:var(--color-midnight); margin-bottom:6px;">当你需要写一封"不好写"的邮件</div>
+      <p style="font-size:12.5px; color:rgba(5,36,57,0.6); line-height:1.65; margin-bottom:14px;">催款、投诉、拒绝Shipper的不合理要求、向Carrier升级——这类邮件语气需要拿捏得当。</p>
+      <div style="background:var(--color-terrain); border-radius:8px; padding:11px 13px; font-size:12px; color:var(--color-tinted); line-height:1.6; border-left:3px solid var(--color-teal); cursor:pointer; position:relative;" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我写一封[催付款/拒绝要求/向Carrier投诉/升级问题]的邮件。背景：[简述情况]。要求：语气[坚定但不失礼/友好但明确/正式且有压迫感]，英文输出，不超过150字。
+      </div>
+    </div>
+
+    <div style="background:var(--color-white); border-radius:14px; padding:22px; border:1px solid rgba(5,36,57,0.07); box-shadow:0 1px 6px rgba(0,0,0,0.04); border-top:3px solid var(--color-indigo);">
+      <div style="font-size:22px; margin-bottom:10px;">🧩</div>
+      <div style="font-size:13px; font-weight:800; color:var(--color-midnight); margin-bottom:6px;">当你要向新同事解释一个复杂流程</div>
+      <p style="font-size:12.5px; color:rgba(5,36,57,0.6); line-height:1.65; margin-bottom:14px;">新人入职、接手新账户——你知道怎么做，但要用新人能懂的方式说清楚。</p>
+      <div style="background:var(--color-terrain); border-radius:8px; padding:11px 13px; font-size:12px; color:var(--color-tinted); line-height:1.6; border-left:3px solid var(--color-indigo); cursor:pointer; position:relative;" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我把以下操作流程整理成一份新人能看懂的说明，分步骤写，每步加一句"为什么这一步重要"的解释。[粘贴你的笔记或操作说明]
+      </div>
+    </div>
+
+    <div style="background:var(--color-white); border-radius:14px; padding:22px; border:1px solid rgba(5,36,57,0.07); box-shadow:0 1px 6px rgba(0,0,0,0.04); border-top:3px solid #f59e0b;">
+      <div style="font-size:22px; margin-bottom:10px;">🚨</div>
+      <div style="font-size:13px; font-weight:800; color:var(--color-midnight); margin-bottom:6px;">当出了问题，你需要快速捋清楚</div>
+      <p style="font-size:12.5px; color:rgba(5,36,57,0.6); line-height:1.65; margin-bottom:14px;">货量数据不对、Shipper突然取消、Carrier拒绝装载——事情一团乱，不知道先做什么。</p>
+      <div style="background:var(--color-terrain); border-radius:8px; padding:11px 13px; font-size:12px; color:var(--color-tinted); line-height:1.6; border-left:3px solid #f59e0b; cursor:pointer; position:relative;" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        我遇到了一个紧急情况：[描述发生了什么，涉及哪些方，现在的状态]。请帮我：1) 列出未来2小时内必须做的事（按优先级）；2) 告诉我需要通知哪些人；3) 帮我起草一条给[Shipper/Manager/Carrier]的简短说明。
+      </div>
+    </div>
+
+    <div style="background:var(--color-white); border-radius:14px; padding:22px; border:1px solid rgba(5,36,57,0.07); box-shadow:0 1px 6px rgba(0,0,0,0.04); border-top:3px solid #ec4899;">
+      <div style="font-size:22px; margin-bottom:10px;">📊</div>
+      <div style="font-size:13px; font-weight:800; color:var(--color-midnight); margin-bottom:6px;">当你有数据，但不知道怎么说故事</div>
+      <p style="font-size:12.5px; color:rgba(5,36,57,0.6); line-height:1.65; margin-bottom:14px;">有Looker数据、有Excel表，但上级要的是结论性文字，而不是一堆数字。</p>
+      <div style="background:var(--color-terrain); border-radius:8px; padding:11px 13px; font-size:12px; color:var(--color-tinted); line-height:1.6; border-left:3px solid #ec4899; cursor:pointer; position:relative;" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        这是我这周/这月的数据（已粘贴）。帮我写一段3-5句的英文总结，发给我的manager。重点说：表现好的地方、需要关注的问题、以及我下一步打算怎么做。语气自信，数据说话。
+      </div>
+    </div>
+
+    <div style="background:var(--color-white); border-radius:14px; padding:22px; border:1px solid rgba(5,36,57,0.07); box-shadow:0 1px 6px rgba(0,0,0,0.04); border-top:3px solid var(--color-sky);">
+      <div style="font-size:22px; margin-bottom:10px;">🌏</div>
+      <div style="font-size:13px; font-weight:800; color:var(--color-midnight); margin-bottom:6px;">当你要和International同事沟通一个复杂情况</div>
+      <p style="font-size:12.5px; color:rgba(5,36,57,0.6); line-height:1.65; margin-bottom:14px;">你在China-side，对方在新加坡/美国，需要用英文把一个复杂的China操作情况简明解释清楚。</p>
+      <div style="background:var(--color-terrain); border-radius:8px; padding:11px 13px; font-size:12px; color:var(--color-tinted); line-height:1.6; border-left:3px solid var(--color-sky); cursor:pointer; position:relative;" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我用英文写一段给国际同事的情况说明。背景：[中文描述发生了什么]。要求：简洁不超过5句，专业，不带情绪，说清楚问题、原因、和我们的下一步。
+      </div>
+    </div>
+
+    <div style="background:var(--color-white); border-radius:14px; padding:22px; border:1px solid rgba(5,36,57,0.07); box-shadow:0 1px 6px rgba(0,0,0,0.04); border-top:3px solid var(--color-seafoam);">
+      <div style="font-size:22px; margin-bottom:10px;">🔄</div>
+      <div style="font-size:13px; font-weight:800; color:var(--color-midnight); margin-bottom:6px;">当你要整合散落信息做一份交接文档</div>
+      <p style="font-size:12.5px; color:rgba(5,36,57,0.6); line-height:1.65; margin-bottom:14px;">账户交接、接手新客户——知识散落在邮件、Slack、脑子里，需要整理清楚给接手人。</p>
+      <div style="background:var(--color-terrain); border-radius:8px; padding:11px 13px; font-size:12px; color:var(--color-tinted); line-height:1.6; border-left:3px solid var(--color-seafoam); cursor:pointer; position:relative;" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我把以下关于[客户名称]的散乱信息整理成一份交接文档。包含：客户基本情况、特殊要求/SOP、当前open issues、需要持续关注的事项。[粘贴你的笔记、邮件片段或Slack记录]
+      </div>
+    </div>
+
+  </div>
+
+  <div style="background:var(--color-midnight); border-radius:12px; padding:18px 22px; margin-bottom:8px;">
+    <p style="font-size:13px; color:rgba(255,255,255,0.7); line-height:1.7;">
+      <strong style="color:var(--color-seafoam);">🎯 记住这个判断标准：</strong>
+      当你发现自己在<strong style="color:white;">重复做同一件事</strong>、<strong style="color:white;">对着空白页发呆不知从何写起</strong>、或者<strong style="color:white;">脑子里有思路但组织不起来</strong>的时候——那就是该打开Claude的时候。
+    </p>
+  </div>
+
+  <div style="overflow-x:auto; margin-bottom:24px; display:none;">
+    <table style="width:100%; border-collapse:collapse; font-size:13px; background:var(--color-white); border-radius:12px; overflow:hidden; box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+      <thead>
+        <tr style="background:var(--color-midnight); color:white;">
+          <th style="padding:12px 14px; text-align:left; font-weight:700; width:6%;">WI</th>
+          <th style="padding:12px 14px; text-align:left; font-weight:700; width:28%;">WI 名称</th>
+          <th style="padding:12px 14px; text-align:left; font-weight:700; width:30%;">Claude 能帮你做什么</th>
+          <th style="padding:12px 14px; text-align:left; font-weight:700; width:22%;">节省时间的地方</th>
+          <th style="padding:12px 14px; text-align:left; font-weight:700; width:14%;">难度</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:var(--color-white);">
+          <td style="padding:11px 14px; font-weight:700; color:var(--color-teal);">01</td>
+          <td style="padding:11px 14px; font-weight:600;">Upload Booking Form</td>
+          <td style="padding:11px 14px;">核对Booking Form字段完整性，找出缺漏并生成追问邮件</td>
+          <td style="padding:11px 14px; color:rgba(5,36,57,0.6);">省去逐项人工核查，自动列出需要补充的信息</td>
+          <td style="padding:11px 14px;"><span class="level-tag lv1" style="font-size:10px;padding:2px 8px;">简单</span></td>
+        </tr>
+        <tr style="background:var(--color-terrain);">
+          <td style="padding:11px 14px; font-weight:700; color:var(--color-teal);">02</td>
+          <td style="padding:11px 14px; font-weight:600;">Confirm CRD</td>
+          <td style="padding:11px 14px;">生成催CRD邮件，或起草CRD变更的exception说明</td>
+          <td style="padding:11px 14px; color:rgba(5,36,57,0.6);">标准化催单邮件，不用每次从头写</td>
+          <td style="padding:11px 14px;"><span class="level-tag lv1" style="font-size:10px;padding:2px 8px;">简单</span></td>
+        </tr>
+        <tr style="background:var(--color-white);">
+          <td style="padding:11px 14px; font-weight:700; color:var(--color-teal);">03</td>
+          <td style="padding:11px 14px; font-weight:600;">Non-DG Declaration</td>
+          <td style="padding:11px 14px;">起草发给Carrier/Co-loader的NDG申报邮件（含货描/MSDS说明）</td>
+          <td style="padding:11px 14px; color:rgba(5,36,57,0.6);">不同Carrier格式不同，Claude帮你套对格式</td>
+          <td style="padding:11px 14px;"><span class="level-tag lv1" style="font-size:10px;padding:2px 8px;">简单</span></td>
+        </tr>
+        <tr style="background:var(--color-terrain);">
+          <td style="padding:11px 14px; font-weight:700; color:var(--color-teal);">04</td>
+          <td style="padding:11px 14px; font-weight:600;">Send CFS SO to Shipper</td>
+          <td style="padding:11px 14px;">核对SO邮件内容，检查pickup信息是否完整，生成中文提货信息模版</td>
+          <td style="padding:11px 14px; color:rgba(5,36,57,0.6);">Pickup request模版不用手打，直接生成填空版</td>
+          <td style="padding:11px 14px;"><span class="level-tag lv1" style="font-size:10px;padding:2px 8px;">简单</span></td>
+        </tr>
+        <tr style="background:var(--color-white);">
+          <td style="padding:11px 14px; font-weight:700; color:var(--color-teal);">05</td>
+          <td style="padding:11px 14px; font-weight:600;">Export Dispatch Trucking (DO)</td>
+          <td style="padding:11px 14px;">生成标准格式的提货安排邮件（中文），含地址/日期/特殊要求</td>
+          <td style="padding:11px 14px; color:rgba(5,36,57,0.6);">最高频操作之一，模版化后每次只需填变量</td>
+          <td style="padding:11px 14px;"><span class="level-tag lv1" style="font-size:10px;padding:2px 8px;">简单</span></td>
+        </tr>
+        <tr style="background:var(--color-terrain);">
+          <td style="padding:11px 14px; font-weight:700; color:var(--color-teal);">06</td>
+          <td style="padding:11px 14px; font-weight:600;">Input Cargo Receipt Data</td>
+          <td style="padding:11px 14px;">对比CR数据与Booking Form，标出CBM/GW/件数差异</td>
+          <td style="padding:11px 14px; color:rgba(5,36,57,0.6);">数字核对出错率高，Claude帮你做交叉比对</td>
+          <td style="padding:11px 14px;"><span class="level-tag lv2" style="font-size:10px;padding:2px 8px;">中等</span></td>
+        </tr>
+        <tr style="background:var(--color-white);">
+          <td style="padding:11px 14px; font-weight:700; color:var(--color-teal);">07</td>
+          <td style="padding:11px 14px; font-weight:600;">Upload SI & Send HBL Draft</td>
+          <td style="padding:11px 14px;">核对HBL Draft 10个关键字段，找出与SI不一致的地方</td>
+          <td style="padding:11px 14px; color:rgba(5,36,57,0.6);">HBL错误改起来最麻烦，核对环节前置省大量时间</td>
+          <td style="padding:11px 14px;"><span class="level-tag lv2" style="font-size:10px;padding:2px 8px;">中等</span></td>
+        </tr>
+        <tr style="background:var(--color-terrain);">
+          <td style="padding:11px 14px; font-weight:700; color:var(--color-teal);">08</td>
+          <td style="padding:11px 14px; font-weight:600;">AMS / EMF / ENS Filing</td>
+          <td style="padding:11px 14px;">解释各目的地报关要求差异，帮你核对V&V和Cargo Details格式</td>
+          <td style="padding:11px 14px; color:rgba(5,36,57,0.6);">AMS/ACI/ENS规则差异容易混，Claude当参考手册用</td>
+          <td style="padding:11px 14px;"><span class="level-tag lv2" style="font-size:10px;padding:2px 8px;">中等</span></td>
+        </tr>
+        <tr style="background:var(--color-white);">
+          <td style="padding:11px 14px; font-weight:700; color:var(--color-teal);">09</td>
+          <td style="padding:11px 14px; font-weight:600;">Upload ISF Worksheet</td>
+          <td style="padding:11px 14px;">核对ISF信息（Stuffing Location / Consolidator地址），区分Flexport vs Co-loader格式</td>
+          <td style="padding:11px 14px; color:rgba(5,36,57,0.6);">Flexport vs Shipco仓库地址经常搞混，Claude帮你记</td>
+          <td style="padding:11px 14px;"><span class="level-tag lv1" style="font-size:10px;padding:2px 8px;">简单</span></td>
+        </tr>
+        <tr style="background:var(--color-terrain);">
+          <td style="padding:11px 14px; font-weight:700; color:var(--color-teal);">12</td>
+          <td style="padding:11px 14px; font-weight:600;">Exception</td>
+          <td style="padding:11px 14px;">分析exception类型/紧急程度，给出处理步骤建议，起草通知相关方的邮件</td>
+          <td style="padding:11px 14px; color:rgba(5,36,57,0.6);">突发情况下快速理清思路，不慌不乱</td>
+          <td style="padding:11px 14px;"><span class="level-tag lv2" style="font-size:10px;padding:2px 8px;">中等</span></td>
+        </tr>
+        <tr style="background:var(--color-white);">
+          <td style="padding:11px 14px; font-weight:700; color:var(--color-teal);">13</td>
+          <td style="padding:11px 14px; font-weight:600;">Invoice</td>
+          <td style="padding:11px 14px;">生成标准账单邮件（含付款指引/水单抄送/电放费说明），核对VAT实体信息</td>
+          <td style="padding:11px 14px; color:rgba(5,36,57,0.6);">账单邮件格式固定，Claude生成比手打快3倍</td>
+          <td style="padding:11px 14px;"><span class="level-tag lv1" style="font-size:10px;padding:2px 8px;">简单</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+
+  <!-- SECTION 3: 自研工具 -->
+  <div id="tools" class="section-title">自己开发小工具 — 不需要会coding</div>
+
+  <div class="golden-rule" style="border-left-color: var(--color-indigo);">
+    <h3 style="color: #a5b4fc;">🛠️ Claude 能帮你"做"出一个工具</h3>
+    <p>你不需要懂代码。只要描述清楚<strong>"我想要一个什么功能的工具"</strong>，Claude就能帮你生成一个可以直接用的网页小程序或Excel公式。以下是几个适合我们团队的方向：</p>
+  </div>
+
+  <div class="level-row">
+    <span class="level-tag lv1">🟢 简单 — 今天就能试</span>
+    <span class="level-tag lv2">🔵 中等 — 花20分钟迭代</span>
+    <span class="level-tag lv3">🟣 进阶 — 多来回调整</span>
+  </div>
+
+  <div class="builder-grid">
+
+    <div class="builder-card">
+      <h4>📦 <span>集装箱利用率计算器</span> <span class="level-tag lv1" style="font-size:10px;padding:2px 8px;">简单</span></h4>
+      <p>输入CBM和重量，自动算出最优箱型和利用率百分比，生成可分享的网页。</p>
+      <div class="builder-prompt" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我做一个集装箱利用率计算器网页。用户输入多个SKU的CBM、重量、数量，自动计算总CBM和重量，并显示20GP/40GP/40HQ三种箱型的利用率进度条。风格简洁专业。
+      </div>
+    </div>
+
+    <div class="builder-card">
+      <h4>📅 <span>截关日期提醒表</span> <span class="level-tag lv1" style="font-size:10px;padding:2px 8px;">简单</span></h4>
+      <p>输入ETD，自动反推截关时间，生成一个清晰的时间轴，可以截图发给shipper。</p>
+      <div class="builder-prompt" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我做一个LCL截关日期计算器。输入ETD，自动计算：VGM截止（ETD-3天）、文件截止（ETD-2天）、货物截关（ETD-1天），显示为时间轴图，可以截图分享。
+      </div>
+    </div>
+
+    <div class="builder-card">
+      <h4>📬 <span>延误通知邮件生成器</span> <span class="level-tag lv2" style="font-size:10px;padding:2px 8px;">中等</span></h4>
+      <p>填写几个字段（客户名、原因、新ETA），自动生成中英双语标准延误邮件。</p>
+      <div class="builder-prompt" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我做一个延误通知邮件生成器网页。用户填写：客户名、延误原因（下拉选择）、原ETA、新ETA、已采取措施。点击生成后，输出中英双语专业邮件，可以一键复制。
+      </div>
+    </div>
+
+    <div class="builder-card">
+      <h4>✅ <span>Shipper Onboarding Checklist</span> <span class="level-tag lv2" style="font-size:10px;padding:2px 8px;">中等</span></h4>
+      <p>交互式清单，勾选已完成项目，自动计算进度，可以按客户保存状态。</p>
+      <div class="builder-prompt" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我做一个LCL Shipper Onboarding进度追踪网页。分为几个阶段（文件收集、系统设置、首票测试、正式启动），每个阶段有若干子项可以勾选，显示总体完成进度条，用Flexport风格配色。
+      </div>
+    </div>
+
+    <div class="builder-card">
+      <h4>📊 <span>周报OTP自动分析</span> <span class="level-tag lv3" style="font-size:10px;padding:2px 8px;">进阶</span></h4>
+      <p>上传CSV数据，Claude自动找出问题航线并生成可发给Manager的简报。</p>
+      <div class="builder-prompt" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我做一个OTP数据分析工具网页。用户上传CSV文件，工具自动：计算各航线OTP%、标红低于90%的航线、显示趋势图、生成一段可以直接发给manager的英文简报文字。
+      </div>
+    </div>
+
+    <div class="builder-card">
+      <h4>🌐 <span>中英物流术语速查表</span> <span class="level-tag lv1" style="font-size:10px;padding:2px 8px;">简单</span></h4>
+      <p>可搜索的LCL专业术语对照表，新人培训和日常查询都好用。</p>
+      <div class="builder-prompt" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我做一个LCL物流术语速查网页。包含50个常用术语的中英对照和简短解释（如CBM、OTP、CFS、TPEB、co-loader、FIRMS code等），支持搜索，可以手机端浏览。
+      </div>
+    </div>
+
+    <div class="builder-card">
+      <h4>📬 <span>BOC邮件模版库</span> <span class="level-tag lv2" style="font-size:10px;padding:2px 8px;">中等</span></h4>
+      <p>把SOP里所有常用邮件模版整合成一个网页，按WI分类，点击就能复制对应模版。</p>
+      <div class="builder-prompt" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我做一个BOC邮件模版库网页。左侧是WI分类列表（NDG申报/提货安排/HBL催确认/账单通知/延误通知），右侧显示对应邮件模版，含[填空占位符]，点击模版可以一键复制。支持搜索关键词。Flexport深蓝配色风格。
+      </div>
+    </div>
+
+    <div class="builder-card">
+      <h4>⏱️ <span>Shipment关键节点倒计时表</span> <span class="level-tag lv2" style="font-size:10px;padding:2px 8px;">中等</span></h4>
+      <p>输入CRD和ETD，自动生成从CRD到HBL Release的全流程关键日期表，可发给Shipper。</p>
+      <div class="builder-prompt" onclick="copyPrompt(this)">
+        <span class="copy-hint">点击复制</span>
+        帮我做一个LCL Shipment时间节点计算器网页。输入CRD和ETD，自动生成：SO发出时间（CRD-14天）、DO发送截止（CFS Open前1天）、货物截关（ETD前1-3天视carrier）、SI截止（CFS cut off次日）、ISF截止（ETD-3天）、HBL生成（ATD后3天）。显示为时间轴，可截图发给Shipper。
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SECTION 4: DO/DON'T -->
+  <div id="rules" class="section-title">注意事项 — 用Claude要记住的事</div>
+
+  <div class="dos-donts">
+    <div class="do-card">
+      <h4>✅ 这样用，效果最好</h4>
+      <ul>
+        <li>给清楚的背景——说明你是做什么的、这个内容发给谁看</li>
+        <li>把原始资料直接粘贴进去（邮件、表格、聊天记录都行）</li>
+        <li>不满意就追问，不用重新开始对话</li>
+        <li>让Claude先给草稿，你再修改——比从零写快很多</li>
+        <li>指定输出格式（表格/列点/邮件/中文/英文）</li>
+        <li>发出前自己再核对一遍数据和日期</li>
+      </ul>
+    </div>
+    <div class="dont-card">
+      <h4>❌ 避免这些情况</h4>
+      <ul>
+        <li>不要把Flexport内部机密数据（如合同金额、客户数据）粘贴进去</li>
+        <li>不要直接把Claude的输出发给客户，先检查一遍</li>
+        <li>不要问太模糊的问题——"帮我写邮件"比不上"帮我写给XX客户的延误通知"</li>
+        <li>不要期待Claude知道你的系统数据——要自己把数据带进去</li>
+        <li>不要依赖Claude做最终决定，它是助手不是决策者</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- FINAL TIP -->
+  <div class="golden-rule" style="margin-top: 32px; border-left-color: var(--color-seafoam);">
+    <h3>🚀 从今天开始的第一步</h3>
+    <p>
+      选一个你<strong>今天就会用到的场景</strong>，复制上面对应的Prompt，改一改里面的括号内容，粘贴到 <strong>claude.ai</strong> 或手机上的 <strong>Claude App</strong> 试一次。<br><br>
+      遇到不满意的输出？直接告诉Claude"太长了"、"换中文"、"加上XXX信息"——这就是迭代的开始，也是你学会用AI的方式。
+    </p>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <strong>Claude × PRS Network Ops — LCL Operations Team Guide</strong><br>
+  由 Lorry 整理 · 仅供内部使用 · 有问题或想加新模版，找Lorry更新
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ 已复制到剪贴板</div>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`#tab-${name}`).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function copyPrompt(el) {
+  // Get text, strip the "点击复制" hint
+  const clone = el.cloneNode(true);
+  const hint = clone.querySelector('.copy-hint');
+  if (hint) hint.remove();
+  const text = clone.innerText.trim();
+
+  navigator.clipboard.writeText(text).then(() => {
+    const hint2 = el.querySelector('.copy-hint');
+    if (hint2) {
+      hint2.textContent = '✓ 已复制';
+      hint2.classList.add('copied');
+      setTimeout(() => {
+        hint2.textContent = '点击复制';
+        hint2.classList.remove('copied');
+      }, 2000);
+    }
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+}
+
+// Smooth scroll for nav links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>
